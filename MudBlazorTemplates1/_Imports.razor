@@ -1,0 +1,21 @@
+﻿@using System.Net.Http
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.JSInterop
+@using MudBlazor
+@using MudBlazorTemplates1
+@using MudBlazorTemplates1.Shared
+@using Services
+
+
+@inject IHttpClientFactory ClientFactory
+@inject HttpClient Http
+@inject ApiService apiService
+@inject ISnackbar snackBar
+
+
+@inject IJSRuntime JsRuntime

@@ -1,0 +1,63 @@
+﻿@page "/fetchdata"
+@using MudBlazorTemplates1.Data
+@using ResponseModel
+@inject IJSRuntime jsRuntime
+
+
+<MudSelect T="string" Placeholder="Seleccione un Documento" @bind-Value="Id" Label="Documento" AnchorOrigin="Origin.BottomCenter" OnOpen="GetDocuments">
+    @foreach (var document in documents)
+    {
+        <MudSelectItem onchange="guardarNombre" Value="@document.id"> @document.name</MudSelectItem>
+    }
+</MudSelect>
+
+
+<MudItem xs="12" sm="6" md="6">
+    <MudTextField T="string" @bind-Value="NombreD" Label="Nombre" Variant="Variant.Text" Lines="1" />
+</MudItem>
+
+
+<MudButton OnClick="getDocument" Variant="Variant.Filled" StartIcon="@Icons.Rounded.PersonRemove" Color="Color.Error" Size="Size.Large">
+    <MudText>Descargar</MudText>
+</MudButton>
+
+
+@code {
+    private string Id = null;
+    private string NombreD = null;
+    public List<DocumentsResponse> documents = new();
+    public byte[] fileBytes {get; set; }
+    private async Task GetDocuments()
+    {
+        var response = await apiService.HttpClient.GetAsync("/api/Datos");
+        try
+        {
+            response.EnsureSuccessStatusCode();
+            documents = await response.Content.ReadFromJsonAsync<List<DocumentsResponse>>();
+        }
+        catch (HttpRequestException)
+        {
+            snackBar.Add($"error", severity: Severity.Error);
+        }
+    }
+
+    private async Task getDocument()
+    {
+        var response = await apiService.HttpClient.GetAsync($"/api/Datos/id?id={Id}");
+        try
+        {
+            response.EnsureSuccessStatusCode();
+            Id = "";
+            fileBytes = await response.Content.ReadAsByteArrayAsync();
+            // Llamamos a la función JS
+            await JsRuntime.InvokeVoidAsync("BlazorDownloadFile", NombreD,".pdf", fileBytes);
+            //await JsRuntime.InvokeVoidAsync("BlazorDownloadFile.saveAsFile", NombreD, fileBytes);
+
+            
+        }
+        catch (HttpRequestException)
+        {
+            snackBar.Add($"Error", Severity.Error);
+        }
+    }
+}
